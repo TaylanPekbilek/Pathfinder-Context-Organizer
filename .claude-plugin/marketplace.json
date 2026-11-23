@@ -1,0 +1,10 @@
+{
+  "name": "pathfinder-context-organizer-marketplace",
+  "description": "Local Claude Code tools for reviewing and carrying context between sessions.",
+  "owner": { "name": "TaylanPekbilek" },
+  "plugins": [
+    { "name": "pathfinder-context-organizer", "source": "./" }
+  ]
+}
+
+

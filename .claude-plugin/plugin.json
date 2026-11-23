@@ -1,0 +1,11 @@
+{
+  "name": "pathfinder-context-organizer",
+  "displayName": "Pathfinder Context Organizer",
+  "description": "Prepare and use a user-approved Markdown handoff from one selected Claude Code session.",
+  "version": "0.1.0-rc.1",
+  "author": { "name": "TaylanPekbilek" },
+  "homepage": "https://github.com/TaylanPekbilek/Pathfinder-Context-Organizer",
+  "repository": "https://github.com/TaylanPekbilek/Pathfinder-Context-Organizer",
+  "license": "MIT"
+}
+

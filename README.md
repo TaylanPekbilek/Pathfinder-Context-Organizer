@@ -1,70 +1,55 @@
-# Pathfinder - Context Organizer
+# Pathfinder Context Organizer
 
-**Carry the decisions, open tasks, and references you choose into your next Claude Code session.**
+A local CLI for reviewing context from one explicitly selected Claude Code JSONL file and exporting selected context as UTF-8 Markdown.
 
-Pathfinder Context Organizer is a local CLI that reads one Claude Code JSONL file you select and proposes context for a Markdown handoff. Review and edit those proposals, then choose which approved items to export.
+## Claude Code plugin
 
-[English](#quick-start) | [Türkçe](#türkçe)
+Install the plugin from this repository using Claude Code:
 
-## Why
+```text
+/plugin marketplace add TaylanPekbilek/Pathfinder-Context-Organizer
+/plugin install pathfinder-context-organizer@pathfinder-context-organizer-marketplace
+```
 
-When a long coding session ends, the next session often needs just a few things: what changed, why a decision was made, and what still needs doing. Context Organizer lets you review those details before carrying them forward.
+In a new session, run `/pathfinder-context-organizer:handoff` for interactive CLI guidance, or give the command a single approved Markdown handoff path to use it as session context. The skill runs on request. It does not install software, launch background commands, or discover session files. Reading a handoff into Claude Code adds that approved Markdown to the active session context.
 
-## Quick start
+The separate Python CLI performs the import, review, and export. Install it manually as described below. The optional provider workflow is a CLI feature and is not invoked by the plugin.
 
-This page introduces the release candidate. The commands below require a local copy of the project source.
+## Install and verify
 
-Requires Python 3.13 or newer and uv. From a checkout containing the project source, run the synthetic demo in PowerShell:
+Requires Python 3.13 or newer and uv. In PowerShell, from this folder:
 
 ```powershell
 uv sync
+uv run pathfinder-context --help
+uv run pytest
+uv run mypy
+uv run ruff check src tests
 uv run python examples/demo.py
 ```
 
-The demo imports a synthetic session, approves one item, writes a Markdown handoff, and deletes its disposable project data and tracked output. It checks that the source file's SHA-256 stays the same.
+The demo uses a disposable database and the synthetic session in `examples/session.jsonl`. It checks that the source file's SHA-256 remains unchanged after import, review, handoff, and deletion.
 
-## The 30-second example
+## Use
 
 ```powershell
 $session = (Resolve-Path examples/session.jsonl).Path
 uv run pathfinder-context import Demo $session
 uv run pathfinder-context list Demo
 uv run pathfinder-context review Demo ITEM_ID confirm
-uv run pathfinder-context handoff Demo --select ITEM_ID:essential --purpose "Continue the documentation work"
+uv run pathfinder-context handoff Demo --select ITEM_ID:essential --purpose "Continue the work"
+uv run pathfinder-context delete Demo --with-handoffs
 ```
 
-Replace `ITEM_ID` with an ID from `list`. Type `yes` at each approval prompt. Repeat `--select` to include multiple approved items.
+Type `yes` at each confirmation prompt. Replace `ITEM_ID` with the ID printed by `list`. Use `review … edit --text "…"` to edit a proposal or `review … reject` to reject it. Repeat `--select` for each item to include. A package ID printed by `handoff` can be used with `render PACKAGE_ID --profile detailed`.
 
-The deterministic extractor recognizes explicit labels such as `Status:`, `Decision:`, `Todo:`, `File:`, `Assumption:`, and `Risk:`, including Turkish equivalents.
+The deterministic extractor recognizes line labels such as `Status:`, `Decision:`, `Todo:`, `File:`, `Assumption:`, and `Risk:`, with Turkish equivalents. Unlabelled source text stays out of deterministic proposals. Inspect proposals before confirming them. Secret-marked items are blocked from transfer. Token estimates use the byte length of the entire rendered document as a conservative budget.
 
-## What the release candidate does
+The CLI stores derived records in `pathfinder.sqlite3` and tracked Markdown in its sibling `pathfinder-handoffs` directory. Use `--db FILE` before the command to select a separate database. Give each database its own directory to keep outputs easy to identify. Comprehensive project deletion shows the affected records and tracked files before confirmation. External copies remain under your control.
 
-| Step | Behavior |
-| --- | --- |
-| Import | Reads one selected absolute JSONL path after approval, checks for changes, and skips duplicate imports |
-| Review | Lets you edit, confirm, or reject proposals |
-| Handoff | Previews the selection and writes UTF-8 Markdown after approval. Supports short, standard, and detailed profiles |
-| Delete | Previews the affected project data, approved packages, and tracked Markdown files. Copies elsewhere are managed separately |
+## Optional model extraction
 
-## Privacy and scope
+Add `--model MODEL_NAME` to an import to preview and separately approve an Anthropic-compatible request. The key is read from `ANTHROPIC_API_KEY` or the environment variable named by `--key-env`. Use `--endpoint https://HOST/v1/messages` for a compatible gateway. The prompt shows the endpoint and the exact redacted scope. Segments marked private or secret are omitted. If consent is declined, the request times out, or output fails validation, the deterministic proposals remain available. Model proposals require the same user review as deterministic proposals.
 
-The deterministic workflow runs locally and needs no API key. The source file is read-only, and the local SQLite database stores derived records and operational metadata. Redaction happens before extraction. Inspect the preview before sharing any handoff.
+To propose a correction to confirmed content, run `review … edit --text "…"` and then confirm the replacement ID. Use `review … edit --topic "Title"` to attach a topic and `list PROJECT --topics` to list topic IDs.
 
-Optional Anthropic-compatible extraction with `--model` shows the endpoint and redacted scope and requires separate approval. Private and secret segments stay out of that request. If you decline or the provider fails, deterministic proposals remain available.
-
-**0.1.0rc1** passed 102 tests on Python 3.13.11, including the deterministic end-to-end demo. The optional model workflow was verified with a fake provider and HTTP mock.
-
-## Türkçe
-
-Tek bir Claude Code oturum dosyası seçip içe aktar. Oluşan durum, karar, açık iş ve referans önerilerini incele. Onayladığın ve seçtiğin öğeleri yeni oturum için Markdown devir paketine dönüştür.
-
-Kaynak kodun bulunduğu klasörde `uv sync` ve ardından `uv run python examples/demo.py` komutlarını çalıştırarak sentetik demoyu deneyebilirsin. Deterministik akış yerelde çalışır ve API anahtarı gerektirmez.
-
-## Pathfinder tools
-
-- [Pathfinder FileGuard](https://github.com/TaylanPekbilek/Pathfinder-FileGuard) blocks verified duplicate file reads within a Claude Code context.
-- [Pathfinder MCPGuard](https://github.com/TaylanPekbilek/Pathfinder-MCPGuard) protects the context window from oversized MCP results.
-
-## License
-
-[MIT](LICENSE)

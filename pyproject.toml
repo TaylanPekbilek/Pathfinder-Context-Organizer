@@ -1,0 +1,42 @@
+# pyproject.toml
+[build-system]
+requires = ["uv_build>=0.12.9,<0.14"]
+build-backend = "uv_build"
+
+[project]
+name = "pathfinder-context-organizer"
+version = "0.1.0rc1"
+description = "Local-first context organizer for Claude CLI and Claude Code sessions."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = ["httpx>=0.28,<1"]
+
+[project.scripts]
+pathfinder-context = "pathfinder_context_organizer.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "mypy>=1.10",
+  "ruff>=0.5",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+files = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+
+
+

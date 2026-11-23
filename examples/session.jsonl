@@ -1,0 +1,4 @@
+{"type":"user","message":{"role":"user","content":"Status: The documentation draft is ready.\nDecision: Use the local SQLite store.\nTodo: Review the export wording."}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"File: docs/guide.md\nAssumption: The next session starts fresh.\nRisk: The source may change during import."}]}}
+{"type":"user","message":{"role":"user","content":"Status: Fixture api_key=sk-EXAMPLE_NOTREAL_ABC123DEF456\nFile: C:\\Users\\Synthetic Person\\private.txt"}}
+

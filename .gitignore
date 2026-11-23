@@ -1,0 +1,10 @@
+.tools/
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+pathfinder.sqlite3*
+pathfinder-handoffs/
+
